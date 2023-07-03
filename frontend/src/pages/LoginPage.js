@@ -16,7 +16,7 @@ export default function LoginPage() {
             console.log(data)
             setUser(data)
             alert('Login successful')
-            // setRedirect(true)
+            setRedirect(true)
         } catch (exception) {
             alert('Login failed')
             console.log(exception)
