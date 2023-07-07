@@ -40,7 +40,9 @@ app.post('/register', async (request, response) => {
         response.status(422).json(exception)
     }
 })
+
 app.post('/login', async (request, response) => {
+    console.log("Login route accessed");
     const {email, password} = request.body;
     const userDoc = await User.findOne({email})
     if (userDoc) {
@@ -50,8 +52,13 @@ app.post('/login', async (request, response) => {
                 email: userDoc.email, id:userDoc._id}, 
                 jwtSecret, {}, 
                 (error, token) => {
-                if (error) throw error;
-                response.cookie('token',token).json(userDoc)
+                    try {
+                        if (error) throw error;
+                        console.log("Token value:", token);
+                        response.cookie('token',token).json(userDoc)
+                    } catch (error) {
+                        console.log(error)
+                    }
                 })
         } else {
             response.status(422).json('password not ok')
@@ -62,17 +69,25 @@ app.post('/login', async (request, response) => {
 })
 
 app.get('/profile', (request, response) => {
-    const {token} = request.cookies;
+    const { token } = request.cookies;
     if (token) {
-        jwt.verify(token, jwtSecret, {}, (error, user) => {
-            if (error) throw error;
-            response.json(user)
-        })
+        jwt.verify(token, jwtSecret, {}, async (error, userData) => {
+            if (error) {
+                response.json("error");
+            } else {
+                const {name, email, _id} = await User.findById(userData.id)
+                response.json({name, email, _id});
+            }
+        });
     } else {
-        response.json("error")
+        response.json("error");
     }
-})
+});
 
+
+app.post('/logout', (request, response) => {
+    response.cookie('token','').json(true)
+})
 // Srq68bjXxR2wcPC5
 const PORT = 4000;
 app.listen(PORT, function() {

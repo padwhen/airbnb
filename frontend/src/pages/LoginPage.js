@@ -13,7 +13,6 @@ export default function LoginPage() {
         event.preventDefault();
         try {
             const {data} = await axios.post('/login', {email, password})
-            console.log(data)
             setUser(data)
             alert('Login successful')
             setRedirect(true)
@@ -29,7 +28,7 @@ export default function LoginPage() {
     return (
         <div className="mt-4 grow flex items-center justify-around">
             <div className="mb-64">
-            <h1 className="text-4xl text-center mb-4">Welcome to AirBnb</h1>
+            <h1 className="text-4xl text-center mb-4">Login</h1>
             <form className="max-w-md mx-auto" onSubmit={handleLoginSubmit}>
                 <input type="email" placeholder="your@email.com" 
                 value={email} 
