@@ -6,7 +6,8 @@ const bcrypt = require('bcryptjs');
 const User = require('./models/User');
 const cookieParser = require('cookie-parser')
 const jwt = require('jsonwebtoken')
-
+const imageDownloader = require('image-downloader')
+const path = require('path')
 
 require('dotenv').config()
 app.use(cors({
@@ -15,6 +16,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
+app.use('/uploads', express.static(__dirname+'/uploads'))
 
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = 'jfbnasjfbasjbfjasbfj'; //random string
@@ -88,6 +90,18 @@ app.get('/profile', (request, response) => {
 app.post('/logout', (request, response) => {
     response.cookie('token','').json(true)
 })
+
+app.post('/upload-by-link', async (request, response) => {
+    const {link} = request.body;
+    const newName = 'photo' + Date.now() + '.jpg'
+    const destPath = path.join(__dirname, 'uploads', newName);
+    await imageDownloader.image({
+        url: link,
+        dest: destPath
+    });
+    response.json(newName)
+})
+
 // Srq68bjXxR2wcPC5
 const PORT = 4000;
 app.listen(PORT, function() {
