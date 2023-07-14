@@ -8,6 +8,9 @@ const cookieParser = require('cookie-parser')
 const jwt = require('jsonwebtoken')
 const imageDownloader = require('image-downloader')
 const path = require('path')
+const multer = require('multer')
+const fs = require('fs')
+
 
 require('dotenv').config()
 app.use(cors({
@@ -16,7 +19,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(cookieParser());
-app.use('/uploads', express.static(__dirname+'/uploads'))
+app.use('/uploads', express.static(__dirname+'/uploads/'))
 
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = 'jfbnasjfbasjbfjasbfj'; //random string
@@ -102,6 +105,19 @@ app.post('/upload-by-link', async (request, response) => {
     response.json(newName)
 })
 
+const photosMiddleware = multer({dest: 'uploads/'})
+app.post('/uploads', photosMiddleware.array('photos',100),(request, response) => {
+    const uploadFiles = [];
+    for (let i=0; i < request.files.length; i++) {
+        const {path, originalname} = request.files[i]
+        const parts = originalname.split('.')
+        const ext = parts[parts.length - 1]
+        const newPath = path + '.' + ext
+        fs.renameSync(path, newPath)
+        uploadFiles.push(newPath.replace('uploads\\',''))
+    }
+    response.json(uploadFiles)
+});
 // Srq68bjXxR2wcPC5
 const PORT = 4000;
 app.listen(PORT, function() {
