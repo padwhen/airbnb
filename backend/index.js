@@ -10,6 +10,7 @@ const imageDownloader = require('image-downloader')
 const path = require('path')
 const multer = require('multer')
 const fs = require('fs')
+const Place = require('./models/Places')
 
 
 require('dotenv').config()
@@ -106,6 +107,7 @@ app.post('/upload-by-link', async (request, response) => {
 })
 
 const photosMiddleware = multer({dest: 'uploads/'})
+
 app.post('/uploads', photosMiddleware.array('photos',100),(request, response) => {
     const uploadFiles = [];
     for (let i=0; i < request.files.length; i++) {
@@ -118,6 +120,34 @@ app.post('/uploads', photosMiddleware.array('photos',100),(request, response) =>
     }
     response.json(uploadFiles)
 });
+
+app.post('/places', async (request, response) => {
+    const {token} = request.cookies;
+    const {title, address, addedPhotos, 
+        description, perks, extraInfo, checkIn, checkOut, maxGuests} = request.body;
+    jwt.verify(token, jwtSecret, {}, async (error, userData) => {
+        if (error) throw error;
+        const placeDoc = await Place.create({
+            owner: userData.id,
+            title, address, photos: addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests
+        })
+        response.json(placeDoc)
+    })
+})
+
+app.get('/places', (request, response) => {
+    const {token} = request.cookies
+    jwt.verify(token, jwtSecret, {}, async (error, userData) => {
+        const {id} = userData
+        response.json( await Place.find({owner: id}))
+    })
+    
+})
+
+app.get('/places/:id', async (request, response) => {
+    const {id} = request.params
+    response.json(await Place.findById(id))
+})
 // Srq68bjXxR2wcPC5
 const PORT = 4000;
 app.listen(PORT, function() {
