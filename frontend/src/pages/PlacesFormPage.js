@@ -57,14 +57,25 @@ export default function PlacesFormPage() {
         )
     }
 
-    async function addNewPlace(event) {
+    async function savePlace(event) {
         event.preventDefault();
-        const placeData = {title, address, 
+        const placeData = {
+            title, address, 
             addedPhotos, description, 
             perks, extraInfo, checkIn, 
-            checkOut, maxGuests}
+            checkOut, maxGuests
+        }
+        if (id) {
+            // update
+            await axios.put('/places', {
+                id, ...placeData
+            });
+            setRedirect(true)
+        } else {
+            // new place
         await axios.post('/places', placeData)
         setRedirect(true)
+        }
     }
 
     if (redirect) {
@@ -74,7 +85,7 @@ export default function PlacesFormPage() {
     return (
     <div>
         <AccountNav />
-        <form onSubmit={addNewPlace}>
+        <form onSubmit={savePlace}>
             {preInput('Title','title for your place, should be short and catchy as in advertisement')}
             <input type="text" value={title} onChange={event => setTitle(event.target.value)} placeholder="Title, for example: My lovely apartment" /> 
                     
