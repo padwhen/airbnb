@@ -124,18 +124,18 @@ app.post('/uploads', photosMiddleware.array('photos',100),(request, response) =>
 app.post('/places', async (request, response) => {
     const {token} = request.cookies;
     const {title, address, addedPhotos, 
-        description, perks, extraInfo, checkIn, checkOut, maxGuests} = request.body;
+        description, perks, extraInfo, checkIn, checkOut, maxGuests, price} = request.body;
     jwt.verify(token, jwtSecret, {}, async (error, userData) => {
         if (error) throw error;
         const placeDoc = await Place.create({
             owner: userData.id,
-            title, address, photos: addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests
+            title, address, photos: addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests, price
         })
         response.json(placeDoc)
     })
 })
 
-app.get('/places', (request, response) => {
+app.get('/user-places', (request, response) => {
     const {token} = request.cookies
     jwt.verify(token, jwtSecret, {}, async (error, userData) => {
         const {id} = userData
@@ -152,19 +152,24 @@ app.get('/places/:id', async (request, response) => {
 app.put('/places', async (request, response) => {
     const {token} = request.cookies;
     const {id, title, address, addedPhotos, 
-        description, perks, extraInfo, checkIn, checkOut, maxGuests} = request.body;
+        description, perks, extraInfo, checkIn, checkOut, maxGuests, price} = request.body;
     jwt.verify(token, jwtSecret, {}, async (error, userData) => {
         if (error) throw error;
         const placeDoc = await Place.findById(id);
         if (userData.id === placeDoc.owner.toString()) {
             placeDoc.set({
-                title, address, photos: addedPhotos, description, perks, extraInfo, checkIn, checkOut, maxGuests
+                title, address, photos: addedPhotos, description, perks, extraInfo, checkIn, 
+                checkOut, maxGuests, price
             })
             await placeDoc.save()
             response.json('ok')
         }
     })
 
+})
+
+app.get('/places', async (request, response) => {
+    response.json(await Place.find());
 })
 // Srq68bjXxR2wcPC5
 const PORT = 4000;
