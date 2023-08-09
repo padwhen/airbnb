@@ -26,9 +26,9 @@ export default function Header() {
           </button>
         </div>
 
-        <div className="flex py-2 px-4 ml-1">
+        <Link to={'/account/places/new'} className="flex py-2 px-4 ml-1">
           Airbnb your home
-        </div>
+        </Link>
 
         <div className="flex py-2 px-4 ml-1">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
