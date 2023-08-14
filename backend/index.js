@@ -11,6 +11,8 @@ const path = require('path')
 const multer = require('multer')
 const fs = require('fs')
 const Place = require('./models/Places')
+const Booking = require('./models/Booking')
+
 
 
 require('dotenv').config()
@@ -170,6 +172,15 @@ app.put('/places', async (request, response) => {
 
 app.get('/places', async (request, response) => {
     response.json(await Place.find());
+})
+
+app.post('/booking', (request, response) => {
+    const {place, checkIn, checkOut, numberOfGuests, mobile, name, price} = request.body
+    Booking.create({place, checkIn, checkOut, numberOfGuests, mobile, name, price})
+    .then((doc) => {
+        response.json(doc)
+    })
+    .catch((error) => {throw error})
 })
 // Srq68bjXxR2wcPC5
 const PORT = 4000;
