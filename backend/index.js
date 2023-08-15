@@ -13,7 +13,14 @@ const fs = require('fs')
 const Place = require('./models/Places')
 const Booking = require('./models/Booking')
 
-
+function getUserDataFromReq(request) {
+    return new Promise((resolve, reject) => {
+        jwt.verify(request.cookies.token, jwtSecret, {}, async (error, userData) => {
+        if (error) throw error
+        resolve(userData);
+    }) 
+    })
+}
 
 require('dotenv').config()
 app.use(cors({
@@ -174,13 +181,22 @@ app.get('/places', async (request, response) => {
     response.json(await Place.find());
 })
 
-app.post('/booking', (request, response) => {
+app.post('/booking', async (request, response) => {
+    const userData = await getUserDataFromReq(request)
     const {place, checkIn, checkOut, numberOfGuests, mobile, name, price} = request.body
-    Booking.create({place, checkIn, checkOut, numberOfGuests, mobile, name, price})
+    Booking.create({place, checkIn, checkOut, numberOfGuests, mobile, name, price, user: userData.id})
     .then((doc) => {
         response.json(doc)
     })
     .catch((error) => {throw error})
+})
+
+
+
+app.get('/bookings', async (request, response) => {
+    const userData = await getUserDataFromReq(request)
+    response.json(await Booking.find({user: userData.id}).populate('place')) 
+    //userData.id = id cua user, da dc assign tu _id phia tren (jwt sign)
 })
 // Srq68bjXxR2wcPC5
 const PORT = 4000;

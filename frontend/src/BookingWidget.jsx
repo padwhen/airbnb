@@ -1,6 +1,7 @@
-import { useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import axios from "axios";
 import { Navigate } from "react-router-dom";
+import { UserContext } from "./UserContext";
 
 export default function BookingWidget({place}) {
 
@@ -27,11 +28,20 @@ export default function BookingWidget({place}) {
     const [mobile, setMobile] = useState('')
     const [redirect, setRedirect] = useState('')
 
+    const {user} = useContext(UserContext)
+
+    useEffect(() => {
+        if (user) {
+            setName(user.name)
+        }
+    }, [])
+
     async function bookThisPlace() {
-        const response = await axios.post('/booking', {checkIn, checkOut, numberOfGuests, name, mobile, place: place._id, 
+        const response = await axios.post('/booking', {checkIn, checkOut, 
+            numberOfGuests, name, mobile, place: place._id,
             price:place.price * calculateTime() })
         const bookingId = response.data._id;
-        setRedirect(`/accounit/bookings/${bookingId}`)
+        setRedirect(`/account/bookings/${bookingId}`)
     }
     if (redirect) {
         return <Navigate to={redirect} />

@@ -26,7 +26,7 @@ export default function Header() {
           </button>
         </div>
 
-        <Link to={'/account/places/new'} className="flex py-2 px-4 ml-1">
+        <Link to={user ? '/account/places/new' : '/login'} className="flex py-2 px-4 ml-1">
           Airbnb your home
         </Link>
 
